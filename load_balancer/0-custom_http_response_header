@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Configures Nginx with a custom X-Served-By HTTP response header
+
+apt-get -y update
+apt-get -y install nginx
+
+echo "Hello World!" > /var/www/html/index.html
+echo "Ceci n'est pas une page" > /var/www/html/404.html
+
+# Add 301 redirect, custom 404 page, and X-Served-By header
+# shellcheck disable=SC2154
+sed -i "s|server_name _;|server_name _;\n\tadd_header X-Served-By \$HOSTNAME;\n\trewrite ^/redirect_me https://youtube.com permanent;\n\terror_page 404 /404.html;\n\tlocation = /404.html {\n\t\tinternal;\n\t}|" /etc/nginx/sites-available/default
+
+service nginx restart
